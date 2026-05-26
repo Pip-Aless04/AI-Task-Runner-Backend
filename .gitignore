@@ -141,3 +141,19 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# Prisma generated client (se regenera con prisma generate)
+/generated/prisma
+
+# Postgres
+postgres/
+
+# Bun
+.bun/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build output
+dist/

@@ -1,0 +1,14 @@
+
+services:
+  db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    container_name: ai-task-runner-db
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
