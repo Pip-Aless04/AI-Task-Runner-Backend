@@ -55,7 +55,7 @@ model Task {
   title        String
   type         TaskType
   instructions String
-  status       TaskStatus
+  status       TaskStatus @default(ACTIVE)
 
   userId       String
   user         User      @relation(fields: [userId], references: [id])
@@ -96,6 +96,11 @@ model TaskRun {
   updatedAt   DateTime      @updatedAt
 }
 
+
+model RevokeTokens {
+  id          Int           @id @default(autoincrement())
+  token       String        @unique
+}
 
 
 

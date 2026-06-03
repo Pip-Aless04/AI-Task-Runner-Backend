@@ -1,11 +1,9 @@
 import {hash, compare} from 'bcrypt'
 
-export class Bcrypt{
+const SALT_ROUND = 10
+export const encryptionPlugin = {
 
-    private static readonly SALT_ROUND = 10
-
-    static hash = async (text: string): Promise<string> => await hash(text, this.SALT_ROUND)
-
-    static compare = async (text: string, compareText: string ): Promise<boolean> => await compare(text, compareText)
-
+    hash: async(text: string): Promise<string> => await hash(text, SALT_ROUND),
+    
+    compare: async(text:string, encryptedText: string): Promise<boolean> => await compare(text, encryptedText)
 }
