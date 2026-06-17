@@ -1,12 +1,11 @@
+import type { Role } from "../../generated/prisma/enums.ts";
 import { encryptionPlugin } from "../../lib/bcrypt.ts";
 import { prisma } from "../../lib/prisma.ts";
-import type { User, UserAuthInput, UserCreateInput, UserUpdateInput } from "../schemas/index.ts";
-import jwt from "jsonwebtoken";
-import "dotenv/config"
+import type { User, UserRegisterInput, PublicUser, UserUpdateInput } from "../schemas/index.ts";
 
 export class UsersModel {
 
-    static async create(user: UserCreateInput): Promise<{ newUser: User; message: string }> {
+    create = async (user: UserRegisterInput): Promise<{ newUser: PublicUser; message: string }> => {
         try {
             const hashPassword = await encryptionPlugin.hash(user.password);
             const newUser = await prisma.user.create({
@@ -14,9 +13,16 @@ export class UsersModel {
                     email: user.email,
                     name: user.name,
                     password: hashPassword,
-                    role: user.role,
-                    status: user.status,
-                }
+                },
+                select: {
+                    id: true,
+                    email: true,
+                    name: true,
+                    role: true,
+                    status: true,
+                    createdAt: true,
+                    updatedAt: true,
+                },
             });
             return { newUser, message: "New user created successfully" };
         } catch (error) {
@@ -25,7 +31,7 @@ export class UsersModel {
         }
     }
 
-    static async getAll(filters: Partial<User>): Promise<User[]> {
+    getAll = async(filters: Partial<User>): Promise<User[]> => {
         try {
             return await prisma.user.findMany({
                 where: filters
@@ -36,59 +42,33 @@ export class UsersModel {
         }
     }
 
-    static async authUser({ email, password }: UserAuthInput): Promise<{ user: Omit<User, "password">; message: string }> {
-        try {
-            const [userExist] = await this.getAll({ email });
-
-            if (!userExist) throw new Error("User not found");
-            if (userExist.status === "INACTIVE") throw new Error("User not active");
-
-            const isValid = await encryptionPlugin.compare(password, userExist.password);
-            if (!isValid) throw new Error("Invalid password");
-
-            const refreshToken = jwt.sign(
-                { id: userExist.id },
-                process.env.JWT_SECRET as string,
-                { expiresIn: "7d" }
-            );
-
-            const { password: _, ...userWithoutPassword } = userExist;
-
-            return {
-                user: { ...userWithoutPassword, refreshToken },
-                message: "User authenticated successfully"
-            };
-        } catch (error) {
-            console.error("Error authenticating user:", error);
-            throw error; // re-lanza porque los errores de negocio (user not found, invalid password) deben llegar al middleware
-        }
-    }
-
-    static async update(id: string, data: UserUpdateInput): Promise<void> {
+    update = async (id: string, data: Partial<UserUpdateInput>): Promise<boolean> => {
         try {
             await prisma.user.update({
                 where: { id },
                 data
             });
+            return true;
         } catch (error) {
             console.error("Error updating user:", error);
             throw new Error("Failed to update user");
         }
     }
 
-    static async revokeToken(id: string): Promise<void> {
+    revokeToken = async (id: string): Promise<boolean> => {
         try {
             await prisma.user.update({
                 where: { id },
                 data: { refreshToken: null }
             });
+            return true;
         } catch (error) {
             console.error("Error revoking refresh token:", error);
             throw new Error("Failed to revoke refresh token");
         }
     }
 
-    static async updatePassword(id:string, newPassword:string){
+    updatePassword = async (id:string, newPassword:string): Promise<boolean> => {
         try {
             const hashPassword = await encryptionPlugin.hash(newPassword);
 
@@ -97,11 +77,27 @@ export class UsersModel {
                 data:{
                     password: hashPassword
                 }
-            })
+            });
+            return true;
         } catch (error) {
             console.error("Error updating password", error)
             throw new Error("Failed to updated password")
         }
     }
+
+    updateRole = async (id: string, newRole: Role): Promise<boolean> => {
+        try {
+            const updatedUser = await prisma.user.update({
+                where: {id},
+                data: {role: newRole},
+            });
+            return updatedUser.role === newRole;
+        } catch (error) {
+            console.error("Error updating role", error)
+            throw new Error("Failed to update role")
+        }
+    }
+
+
 
 }

@@ -1,7 +1,8 @@
 import type { TaskRunModel } from "../../generated/prisma/models.ts"
+import { Prisma } from "../../generated/prisma/client.ts";
 
 export type TaskRunCreateInput = {
-    input: Record<string,unknown>,
+    input: Prisma.InputJsonValue,
     startedAt: Date,
     userId: string,
     taskId: string

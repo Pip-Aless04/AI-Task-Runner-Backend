@@ -1,31 +1,49 @@
+import { createServer, type IncomingMessage, type ServerResponse } from "http";
+import { Router } from "./src/utils/router.ts";
+import { config } from "./config.ts";
+import { UserController } from "./src/modules/users/user.controller.ts";
+//import { authenticateToken } from "./src/middleware/authentication.ts";
 
-import { Role, TaskType } from "./generated/prisma/enums.ts";
-import { TasksModel } from "./src/models/task.ts";
-import { UsersModel } from "./src/models/user.ts";
+const router = new Router()
+// Import and register routes
 
+const server = createServer((req: IncomingMessage, res: ServerResponse) => {
+    // Pass the request and response to the router's handle method
+    router.handle(req, res)
 
-const user = {
-    name: "Mary",
-    role: Role.ADMIN,
-    email: "Mary@gmail.com",
-    id: "",
-    createdAt: new Date(),
-    password: "1234"
-}
+    //PRUEBA
+    router.get("/prueba",(req, res)=>{
+        console.log(req.query)
+        res.end()
+    })
+    
+    //USUARIO
+    //router.get('/users', authenticateToken, UserController.getAll())
+    router.get('/users/:id')
+    router.post('/users')
+    router.put('/users/:id')
+    router.delete('/users/:id')
 
-//UserMode.create(user)
-//UsersModel.getAll({})
-//UsersModel.authUser({email:"Mary@gmail.com", password:"1234"})
-//UsersModel.revokeToken({id:"53f967a3-fae1-436b-bdfc-62e81e237497"})
+    //AUTH
+    router.post('/register')
+    router.post('/login')
 
-// TasksModel.create({
-//     title: "Task 1",
-//     type: TaskType.CLASSIFICATION,
-//     instructions: "Instructions for Task 1",
-//     userId: "53f967a3-fae1-436b-bdfc-62e81e237400"
-// })
+    //TASK
+    router.get('/tasks')
+    router.get('/tasks/:id')
+    router.post('/tasks')
+    router.put('/tasks/:id')
+    router.delete('/tasks/:id')
 
-// await TasksModel.getAll({})
-// await TasksModel.update({id:"83ca3a48-87c2-47d6-9e3f-b7d696a6fa94"},{type:"GENERATION"})
-await TasksModel.getAll({})
-//TasksModel.delete({id:"53f967a3-fae1-436b-bdfc-62e81e237497"})
+    //TASKRUN
+    router.get('/taskruns')
+    router.get('/taskruns/:id')
+    router.post('/taskruns')
+    router.put('/taskruns/:id')
+    router.delete('/taskruns/:id')
+    
+});
+
+server.listen(config.port, () => {
+    console.log(`Server is running on http://localhost:${config.port}`);
+});

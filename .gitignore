@@ -157,3 +157,6 @@ Thumbs.db
 
 # Build output
 dist/
+
+#vscode
+.vscode

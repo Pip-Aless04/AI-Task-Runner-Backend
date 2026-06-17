@@ -1,11 +1,21 @@
-import type { Prisma } from "../../generated/prisma/client.ts";
+import {pipe,string,trim,strictObject,email,minLength, type InferOutput, union, literal} from "valibot";
 import type { UserModel } from "../../generated/prisma/models.ts";
 
-export type UserCreateInput = Pick<Prisma.UserCreateInput, "email" | "name" | "password" | "role" | "status">
+export const UserRegisterSchema = strictObject({
+    name: pipe(string(), trim(), minLength(2)),
+    email: pipe(string(), trim(), email()),
+    password: pipe(string(),minLength(8)),
+});
 
+export type UserRegisterInput = InferOutput<typeof UserRegisterSchema>;
 
-export type User = UserModel
+export type User = UserModel;
+export type PublicUser = Omit<User, "password" | "refreshToken">;
 
-export type UserAuthInput = Pick<User, "email" | "password">
+export const UserUpdateSchema = strictObject({
+    email: pipe(string(), trim(), email()),
+    name: pipe(string(), trim(), minLength(2)),
+    status: union([literal("ACTIVE"), literal("INACTIVE")]),
+});
 
-export type UserUpdateInput = Pick<User, "email" | "name"|"role"|"status">
+export type UserUpdateInput = InferOutput<typeof UserUpdateSchema>;
