@@ -1,4 +1,4 @@
-import { date, object, picklist, pipe, string, uuid, type InferInput, type InferOutput } from "valibot";
+import { date, object, picklist, pipe, string, uuid, type InferOutput } from "valibot";
 
 const taskSchema = object({
     id: pipe(string(), uuid()),

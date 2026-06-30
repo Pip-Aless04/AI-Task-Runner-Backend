@@ -6,9 +6,6 @@ export const createUserRouter = ({ userRepository }: { userRepository: UserRepos
 
     const userRouter = new Router()
 
-    const userController = new UserController({ userRepository }) 
-
-
     userRouter.get("/", userController.getAll())
 
     return userRouter;

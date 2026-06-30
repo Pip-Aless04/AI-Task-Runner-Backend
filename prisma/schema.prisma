@@ -6,6 +6,7 @@
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -84,8 +85,8 @@ model TaskRun {
 
   status      TaskRunStatus @default(PENDING)
 
-  input       Json
-  output      Json?
+  input       String
+  output      String?
   error       String?
 
   duration    Int?

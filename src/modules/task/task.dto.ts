@@ -9,4 +9,10 @@ export type CreateTaskDTO = {
     userId: string,
 }
 
+export type UpdateTaskDTO = {
+    title?: string,
+    type?: TaskType,
+    instructions?: string,
+}
+
 export type TaskFiltersDTO = Partial<Task>

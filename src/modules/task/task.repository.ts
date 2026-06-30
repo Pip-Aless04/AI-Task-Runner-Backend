@@ -1,6 +1,6 @@
 
 import { prisma } from "../../../lib/prisma.ts";
-import type { CreateTaskDTO, TaskFiltersDTO } from "./task.dto.ts";
+import type { CreateTaskDTO, TaskFiltersDTO, UpdateTaskDTO } from "./task.dto.ts";
 import type { Task } from "./task.schemas.ts";
 
 export class TaskRepository {
@@ -53,6 +53,42 @@ export class TaskRepository {
         }
     }
 
+    static update = async (id: string, task: UpdateTaskDTO): Promise<Task> => {
+        try {
+            return await prisma.task.update({
+                where: { id },
+                data: task,
+                select: {
+                    id: true,
+                    title: true,
+                    type: true,
+                    instructions: true,
+                    userId: true,
+                    status: true,
+                    createdAt: true,
+                    updatedAt: true
+                }
+            })
+        } catch (error) {
+            console.error("Error updating task:", error);
+            throw new Error("Failed to update task (Repository)");
+        }
+    }
 
-    
+
+    static incativateTask = async (id: string): Promise<boolean> => {
+        try {
+            await prisma.task.update({
+                where: { id },
+                data: { status: "INACTIVE" }
+            })
+
+            return true;
+
+        } catch (error) {
+            console.error("Error deactivating task:", error);
+            throw new Error("Failed to deactivate task (Repository)");
+        }
+    }
+
 }

@@ -1,13 +1,13 @@
-import { prisma } from "../../lib/prisma.ts";
+import { prisma } from "../../../lib/prisma.ts";
 
-export class RevokeTokenModel {
+export class RevokeTokenRepository {
     
-    static async addRevokeToken(token: string): Promise<void> {
+    static async addRevokeToken(token: string): Promise<boolean> {
         try {
             await prisma.revokeTokens.create({
                 data: { token }
             });
-            console.log("Revoked token added successfully");
+            return true;
         } catch (error) {
             console.error("Error adding revoked token:", error);
             throw new Error("Failed to add revoked token");

@@ -1,14 +1,13 @@
+import type { RegisterUserDto } from "./user.dto.ts";
 import { UserService } from "./user.service.ts";
 
 
 export class UserController {
 
-    static getAll = async (): Promise<any> => {
-        return await UserService.getAll();
+    static create = async(user: RegisterUserDto) => {
+        return await UserService.getAll( user )
     }
 
-    create = async() => {
-        
-    }
+    
 
 }
